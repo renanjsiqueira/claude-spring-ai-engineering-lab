@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: claude-spring-ai-engineering-lab
+
+server:
+  port: 8080
+
+# The Anthropic API key is NEVER stored here.
+# It is read from the ANTHROPIC_API_KEY environment variable when Claude
+# integration is added in Phase 1.
