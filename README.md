@@ -7,7 +7,7 @@ The goal is to build, **phase by phase**, a clean and didactic reference project
 how to engineer real applications on top of Claude — from a single chat call all the way to agents
 and workflows.
 
-> Status: **Phase 0 — Foundation** ✅
+> Status: **Phase 2 — Multi-turn, system prompt & temperature** ✅
 
 ## Why this project
 
@@ -19,8 +19,10 @@ portfolio piece.
 
 - Java 21
 - Spring Boot 3.4
-- Spring AI (Anthropic) — added in Phase 1
+- Spring AI 1.0 (Anthropic / Claude)
 - Maven
+
+Default model: `claude-opus-4-8` (configurable in `application.yml`).
 
 ## Architecture
 
@@ -44,18 +46,19 @@ A simple, readable layered architecture. Each layer is a package under
 The project is built incrementally. Each phase is small, tested, and ends with a suggested commit.
 
 - [x] **Phase 0 — Foundation**: project skeleton, layered packages, health endpoint, tests, CI-friendly build.
-- [ ] **Phase 1 — First Claude call**: integrate Claude via Spring AI (`ANTHROPIC_API_KEY`).
-- [ ] **Phase 2 — Multi-turn conversations**
-- [ ] **Phase 3 — System prompts**
-- [ ] **Phase 4 — Temperature**
-- [ ] **Phase 5 — Response streaming**
-- [ ] **Phase 6 — Structured output**
-- [ ] **Phase 7 — Prompt engineering with XML tags**
-- [ ] **Phase 8 — Prompt evaluation**
-- [ ] **Phase 9 — Tool use**
-- [ ] **Phase 10 — RAG**
-- [ ] **Phase 11 — MCP**
-- [ ] **Phase 12 — Agents and workflows**
+- [x] **Phase 1 — First Claude call**: integrate Claude via Spring AI (`POST /api/chat`, `ANTHROPIC_API_KEY`).
+- [x] **Phase 2 — System prompt, temperature & multi-turn**: `POST /api/chat/conversations` with bounded per-conversation history.
+- [ ] **Phase 3 — Response streaming**
+- [ ] **Phase 4 — Structured output**
+- [ ] **Phase 5 — Prompt engineering with XML tags**
+- [ ] **Phase 6 — Prompt evaluation**
+- [ ] **Phase 7 — Tool use**
+- [ ] **Phase 8 — RAG**
+- [ ] **Phase 9 — MCP**
+- [ ] **Phase 10 — Agents and workflows**
+
+> Note: the original course topics "multi-turn", "system prompts" and "temperature"
+> were delivered together in Phase 2, so later phases are renumbered accordingly.
 
 ## Getting started
 
@@ -66,14 +69,16 @@ The project is built incrementally. Each phase is small, tested, and ends with a
 
 ### Configuration
 
-The Anthropic API key is **never** stored in the code or in version control. From Phase 1 onward
-the application reads it from an environment variable:
+The Anthropic API key is **never** stored in the code or in version control. The application reads
+it from an environment variable:
 
 ```bash
 export ANTHROPIC_API_KEY="your-key-here"
 ```
 
-Phase 0 does not call Claude, so no key is required yet.
+If the variable is not set, the context still starts (using a non-functional `not-set` placeholder)
+so `mvn test` works without a key — but any real call to `/api/chat` will fail until a valid key is
+exported.
 
 ### Build and test
 
@@ -96,7 +101,74 @@ curl http://localhost:8080/api/health
 Expected response:
 
 ```json
-{ "status": "UP", "service": "claude-spring-ai-engineering-lab", "phase": "phase-0" }
+{ "status": "UP", "service": "claude-spring-ai-engineering-lab", "phase": "phase-2" }
+```
+
+## Endpoints
+
+### `POST /api/chat` — send a message to Claude
+
+```bash
+curl -X POST http://localhost:8080/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Explain what Spring AI is in one paragraph"}'
+```
+
+Response:
+
+```json
+{ "content": "..." }
+```
+
+A blank `message` returns `400`:
+
+```bash
+curl -X POST http://localhost:8080/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": ""}'
+```
+
+```json
+{ "error": "message must not be blank" }
+```
+
+### `POST /api/chat/conversations` — multi-turn chat
+
+Adds a fixed **system prompt** (a senior software-engineering assistant), configurable
+**temperature**, and per-conversation **memory**.
+
+- `conversationId` (optional): omit it to start a new conversation; the response returns the
+  generated id so you can continue the thread.
+- `message` (required): the user message.
+- `temperature` (optional): between `0.0` and `1.0`; defaults to `0.2`.
+
+History is kept in memory and bounded to the most recent `claudelab.chat.max-history-messages`
+messages (default `20`), so it never grows without limit.
+
+First turn (no `conversationId`):
+
+```bash
+curl -X POST http://localhost:8080/api/chat/conversations \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Help me write acceptance criteria for a login feature", "temperature": 0.2}'
+```
+
+```json
+{ "conversationId": "3f9c...", "content": "..." }
+```
+
+Continue the same conversation (reuse the returned `conversationId`):
+
+```bash
+curl -X POST http://localhost:8080/api/chat/conversations \
+  -H "Content-Type: application/json" \
+  -d '{"conversationId": "3f9c...", "message": "Now add edge cases for rate limiting"}'
+```
+
+A `temperature` outside `[0.0, 1.0]` returns `400`:
+
+```json
+{ "error": "temperature must be between 0.0 and 1.0" }
 ```
 
 ## License

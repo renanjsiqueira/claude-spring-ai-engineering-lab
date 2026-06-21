@@ -1,10 +1,22 @@
 spring:
   application:
     name: claude-spring-ai-engineering-lab
+  ai:
+    anthropic:
+      # The API key is read from the ANTHROPIC_API_KEY environment variable.
+      # The "not-set" fallback only lets the context start in tests/CI without a
+      # real key — it is never a valid key and any real Claude call will fail
+      # until ANTHROPIC_API_KEY is exported.
+      api-key: ${ANTHROPIC_API_KEY:not-set}
+      chat:
+        options:
+          model: claude-opus-4-8
 
 server:
   port: 8080
 
-# The Anthropic API key is NEVER stored here.
-# It is read from the ANTHROPIC_API_KEY environment variable when Claude
-# integration is added in Phase 1.
+claudelab:
+  chat:
+    # Maximum number of stored messages (user + assistant) per conversation.
+    # Older messages are dropped so history cannot grow without limit.
+    max-history-messages: 20
