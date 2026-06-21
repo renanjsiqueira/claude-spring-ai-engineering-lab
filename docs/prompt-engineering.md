@@ -67,3 +67,45 @@ This is not creative writing; determinism matters more than variety.
 - The schema constrains *shape*, not *quality*: testable acceptance criteria are requested in prose,
   not enforced. Phase "Prompt evaluation" will add graders to measure this.
 - No retry/repair loop yet if the model returns invalid JSON — a parse failure surfaces as a 500.
+
+## Phase 5 — XML prompt templates and few-shot examples
+
+**Goal:** stop scattering prompts as inline string literals and move them into versioned,
+reviewable, testable classes — structured with XML tags and anchored by few-shot examples.
+
+### Where the prompts live now
+
+All prompts are in `com.renansiqueira.claudelab.ai.prompt`:
+
+- `BacklogPromptTemplate` — the backlog analysis system prompt.
+- `ArchitecturePromptTemplate` — an architecture analysis prompt (ready for a future endpoint).
+- `ClaudePromptTemplates` — a single entry point that aggregates them.
+
+`BacklogAnalysisService` now references `BacklogPromptTemplate.SYSTEM` instead of an inline string.
+
+### Why XML tags
+
+Claude responds well to explicit structure. Wrapping each part of the prompt in tags
+(`<role>`, `<context>`, `<task>`, `<rules>`, `<examples>`) makes the boundaries unambiguous for the
+model and trivial to scan for a human reviewer. It also makes the prompt easy to extend — a new
+section is a new tag, not a rewrite.
+
+### Why few-shot examples
+
+The `<examples>` block shows two worked cases — a **feature request** and a **bug report** — each
+with the exact structured JSON we expect back. Few-shot examples calibrate tone, granularity and how
+assumptions/risks are filled far more reliably than instructions alone. The example outputs match the
+`BacklogAnalysisResponse` contract, reinforcing the schema that the structured-output converter
+appends.
+
+### Why prompts are unit-tested
+
+`BacklogPromptTemplateTest` asserts the XML tags are present and that at least two few-shot examples
+exist. The prompt is part of the product behavior, so a careless edit that drops a section or an
+example should fail the build like any other regression.
+
+### Versioning
+
+Keeping prompts in code means they are versioned with the rest of the project: every change is a diff
+in git, reviewable in a PR, and revertible. When we add prompt evaluation (a later phase) these
+classes are the natural unit to grade and compare across versions.

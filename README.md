@@ -7,7 +7,7 @@ The goal is to build, **phase by phase**, a clean and didactic reference project
 how to engineer real applications on top of Claude — from a single chat call all the way to agents
 and workflows.
 
-> Status: **Phase 4 — Response streaming (SSE)** ✅
+> Status: **Phase 5 — XML prompt templates & few-shot** ✅
 
 ## Why this project
 
@@ -41,6 +41,15 @@ A simple, readable layered architecture. Each layer is a package under
 | `workflow`    | Agents and multi-step workflows                            |
 | `infra`       | Cross-cutting infrastructure and configuration             |
 
+## Prompt engineering
+
+Prompts are treated as versioned product artifacts, not inline string literals. They live in
+`com.renansiqueira.claudelab.ai.prompt` (`BacklogPromptTemplate`, `ArchitecturePromptTemplate`,
+aggregated by `ClaudePromptTemplates`), use **XML tags** (`<role>`, `<context>`, `<task>`, `<rules>`,
+`<examples>`) to make structure explicit, and include **few-shot examples**. They are unit-tested so
+a careless edit fails the build. See [`docs/prompt-engineering.md`](docs/prompt-engineering.md) for
+the rationale and per-phase notes.
+
 ## Roadmap (phases)
 
 The project is built incrementally. Each phase is small, tested, and ends with a suggested commit.
@@ -50,7 +59,7 @@ The project is built incrementally. Each phase is small, tested, and ends with a
 - [x] **Phase 2 — System prompt, temperature & multi-turn**: `POST /api/chat/conversations` with bounded per-conversation history.
 - [x] **Phase 3 — Structured output**: `POST /api/backlog/analyze` returns a typed backlog item (no free text outside the contract).
 - [x] **Phase 4 — Response streaming**: `GET /api/chat/stream` streams chunks as Server-Sent Events.
-- [ ] **Phase 5 — Prompt engineering with XML tags**
+- [x] **Phase 5 — Prompt engineering with XML tags**: versioned prompt templates (`ai.prompt`) with XML tags and few-shot examples.
 - [ ] **Phase 6 — Prompt evaluation**
 - [ ] **Phase 7 — Tool use**
 - [ ] **Phase 8 — RAG**
@@ -102,7 +111,7 @@ curl http://localhost:8080/api/health
 Expected response:
 
 ```json
-{ "status": "UP", "service": "claude-spring-ai-engineering-lab", "phase": "phase-4" }
+{ "status": "UP", "service": "claude-spring-ai-engineering-lab", "phase": "phase-5" }
 ```
 
 ## Endpoints

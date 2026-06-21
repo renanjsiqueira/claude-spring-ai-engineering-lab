@@ -15,7 +15,7 @@ public class HealthController {
 
     @GetMapping("/health")
     public HealthResponse health() {
-        return new HealthResponse("UP", "claude-spring-ai-engineering-lab", "phase-4");
+        return new HealthResponse("UP", "claude-spring-ai-engineering-lab", "phase-5");
     }
 
     /**
