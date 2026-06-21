@@ -7,7 +7,7 @@ The goal is to build, **phase by phase**, a clean and didactic reference project
 how to engineer real applications on top of Claude — from a single chat call all the way to agents
 and workflows.
 
-> Status: **Phase 2 — Multi-turn, system prompt & temperature** ✅
+> Status: **Phase 3 — Structured output (backlog analysis)** ✅
 
 ## Why this project
 
@@ -18,8 +18,8 @@ portfolio piece.
 ## Tech stack
 
 - Java 21
-- Spring Boot 3.4
-- Spring AI 1.0 (Anthropic / Claude)
+- Spring Boot 3.5
+- Spring AI 1.1 (Anthropic / Claude)
 - Maven
 
 Default model: `claude-opus-4-8` (configurable in `application.yml`).
@@ -48,8 +48,8 @@ The project is built incrementally. Each phase is small, tested, and ends with a
 - [x] **Phase 0 — Foundation**: project skeleton, layered packages, health endpoint, tests, CI-friendly build.
 - [x] **Phase 1 — First Claude call**: integrate Claude via Spring AI (`POST /api/chat`, `ANTHROPIC_API_KEY`).
 - [x] **Phase 2 — System prompt, temperature & multi-turn**: `POST /api/chat/conversations` with bounded per-conversation history.
-- [ ] **Phase 3 — Response streaming**
-- [ ] **Phase 4 — Structured output**
+- [x] **Phase 3 — Structured output**: `POST /api/backlog/analyze` returns a typed backlog item (no free text outside the contract).
+- [ ] **Phase 4 — Response streaming**
 - [ ] **Phase 5 — Prompt engineering with XML tags**
 - [ ] **Phase 6 — Prompt evaluation**
 - [ ] **Phase 7 — Tool use**
@@ -57,8 +57,9 @@ The project is built incrementally. Each phase is small, tested, and ends with a
 - [ ] **Phase 9 — MCP**
 - [ ] **Phase 10 — Agents and workflows**
 
-> Note: the original course topics "multi-turn", "system prompts" and "temperature"
-> were delivered together in Phase 2, so later phases are renumbered accordingly.
+> Note: phases are grouped/ordered as they are actually built, so the numbering
+> can differ from the original course topic order. See
+> [`docs/prompt-engineering.md`](docs/prompt-engineering.md) for prompting notes.
 
 ## Getting started
 
@@ -101,7 +102,7 @@ curl http://localhost:8080/api/health
 Expected response:
 
 ```json
-{ "status": "UP", "service": "claude-spring-ai-engineering-lab", "phase": "phase-2" }
+{ "status": "UP", "service": "claude-spring-ai-engineering-lab", "phase": "phase-3" }
 ```
 
 ## Endpoints
@@ -169,6 +170,43 @@ A `temperature` outside `[0.0, 1.0]` returns `400`:
 
 ```json
 { "error": "temperature must be between 0.0 and 1.0" }
+```
+
+### `POST /api/backlog/analyze` — structured backlog analysis
+
+Takes a raw idea, bug or feature request and returns a **structured** backlog item — no free text
+outside the contract. Built with Spring AI structured output (see
+[`docs/prompt-engineering.md`](docs/prompt-engineering.md)).
+
+```bash
+curl -X POST http://localhost:8080/api/backlog/analyze \
+  -H "Content-Type: application/json" \
+  -d '{"input": "Quero criar uma funcionalidade para importar transações via CSV"}'
+```
+
+```json
+{
+  "type": "FEATURE",
+  "title": "CSV Transaction Import",
+  "summary": "...",
+  "priority": "HIGH",
+  "userStory": "As a user, I want to import transactions via CSV, so that I avoid manual entry.",
+  "acceptanceCriteria": ["Given a valid CSV, when uploaded, then transactions are persisted."],
+  "technicalTasks": ["Add CSV parser", "Validate rows"],
+  "risks": ["CSV column format is unspecified"],
+  "assumptions": ["Assuming UTF-8 encoding"]
+}
+```
+
+- `type`: `FEATURE` | `BUG` | `REFACTOR` | `ARCHITECTURE` | `QUESTION`
+- `priority`: `LOW` | `MEDIUM` | `HIGH` | `CRITICAL`
+- When the input is vague, missing context is captured in `risks` / `assumptions` instead of being
+  invented.
+
+A blank `input` returns `400`:
+
+```json
+{ "error": "input must not be blank" }
 ```
 
 ## License
