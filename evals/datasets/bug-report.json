@@ -1,0 +1,9 @@
+[
+  {
+    "input": "O aplicativo trava quando o token de sessão expira durante uma requisição.",
+    "expectedType": "BUG",
+    "expectedMinimumCriteriaCount": 2,
+    "expectedMinimumTasksCount": 2,
+    "forbiddenTerms": ["TODO"]
+  }
+]

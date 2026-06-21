@@ -1,0 +1,9 @@
+[
+  {
+    "input": "Quero criar uma funcionalidade para importar transações via CSV.",
+    "expectedType": "FEATURE",
+    "expectedMinimumCriteriaCount": 2,
+    "expectedMinimumTasksCount": 2,
+    "forbiddenTerms": ["blockchain", "TODO"]
+  }
+]

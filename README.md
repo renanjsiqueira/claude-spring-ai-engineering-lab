@@ -7,7 +7,7 @@ The goal is to build, **phase by phase**, a clean and didactic reference project
 how to engineer real applications on top of Claude — from a single chat call all the way to agents
 and workflows.
 
-> Status: **Phase 5 — XML prompt templates & few-shot** ✅
+> Status: **Phase 6 — Prompt evaluation** ✅
 
 ## Why this project
 
@@ -60,7 +60,7 @@ The project is built incrementally. Each phase is small, tested, and ends with a
 - [x] **Phase 3 — Structured output**: `POST /api/backlog/analyze` returns a typed backlog item (no free text outside the contract).
 - [x] **Phase 4 — Response streaming**: `GET /api/chat/stream` streams chunks as Server-Sent Events.
 - [x] **Phase 5 — Prompt engineering with XML tags**: versioned prompt templates (`ai.prompt`) with XML tags and few-shot examples.
-- [ ] **Phase 6 — Prompt evaluation**
+- [x] **Phase 6 — Prompt evaluation**: dataset-driven code-based grading (`POST /api/evals/run`), reports in `evals/`.
 - [ ] **Phase 7 — Tool use**
 - [ ] **Phase 8 — RAG**
 - [ ] **Phase 9 — MCP**
@@ -111,7 +111,7 @@ curl http://localhost:8080/api/health
 Expected response:
 
 ```json
-{ "status": "UP", "service": "claude-spring-ai-engineering-lab", "phase": "phase-5" }
+{ "status": "UP", "service": "claude-spring-ai-engineering-lab", "phase": "phase-6" }
 ```
 
 ## Endpoints
@@ -246,6 +246,23 @@ A blank `input` returns `400`:
 ```json
 { "error": "input must not be blank" }
 ```
+
+### `POST /api/evals/run` — run the prompt evaluation suite
+
+Runs every dataset under `evals/datasets/` through the backlog analyzer, grades each case with
+deterministic code-based checks, and returns a pass/fail report (also saved to `evals/results/`).
+This makes **real Claude calls**, so it is a manual tool — see [`docs/evals.md`](docs/evals.md).
+
+```bash
+curl -X POST http://localhost:8080/api/evals/run
+```
+
+```json
+{ "total": 5, "passed": 4, "failed": 1, "scores": [ /* per-case breakdown */ ] }
+```
+
+Each case checks: valid JSON, correct type, has a title, minimum acceptance criteria, minimum
+technical tasks, and absence of forbidden terms.
 
 ## License
 

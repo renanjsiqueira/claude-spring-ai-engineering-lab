@@ -1,0 +1,9 @@
+[
+  {
+    "input": "Devemos usar uma fila de mensagens entre o serviço de pedidos e o de pagamentos para desacoplar a importação de transações?",
+    "expectedType": "ARCHITECTURE",
+    "expectedMinimumCriteriaCount": 1,
+    "expectedMinimumTasksCount": 2,
+    "forbiddenTerms": []
+  }
+]

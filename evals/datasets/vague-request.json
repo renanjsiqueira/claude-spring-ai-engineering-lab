@@ -1,0 +1,9 @@
+[
+  {
+    "input": "Acho que a gente devia melhorar o sistema em algum momento.",
+    "expectedType": "QUESTION",
+    "expectedMinimumCriteriaCount": 0,
+    "expectedMinimumTasksCount": 0,
+    "forbiddenTerms": []
+  }
+]

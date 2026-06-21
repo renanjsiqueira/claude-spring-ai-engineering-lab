@@ -22,6 +22,9 @@ Thumbs.db
 # Logs
 *.log
 
+# Generated evaluation reports (keep the folder via .gitkeep)
+evals/results/*.json
+
 # Local environment / secrets — never commit API keys
 .env
 .env.local

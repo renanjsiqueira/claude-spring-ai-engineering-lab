@@ -1,0 +1,9 @@
+[
+  {
+    "input": "Precisamos refatorar o módulo de pagamentos para esconder o provedor atual atrás de uma interface.",
+    "expectedType": "REFACTOR",
+    "expectedMinimumCriteriaCount": 1,
+    "expectedMinimumTasksCount": 2,
+    "forbiddenTerms": ["TODO"]
+  }
+]
