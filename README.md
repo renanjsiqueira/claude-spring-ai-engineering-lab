@@ -7,7 +7,7 @@ The goal is to build, **phase by phase**, a clean and didactic reference project
 how to engineer real applications on top of Claude — from a single chat call all the way to agents
 and workflows.
 
-> Status: **Phase 3 — Structured output (backlog analysis)** ✅
+> Status: **Phase 4 — Response streaming (SSE)** ✅
 
 ## Why this project
 
@@ -49,7 +49,7 @@ The project is built incrementally. Each phase is small, tested, and ends with a
 - [x] **Phase 1 — First Claude call**: integrate Claude via Spring AI (`POST /api/chat`, `ANTHROPIC_API_KEY`).
 - [x] **Phase 2 — System prompt, temperature & multi-turn**: `POST /api/chat/conversations` with bounded per-conversation history.
 - [x] **Phase 3 — Structured output**: `POST /api/backlog/analyze` returns a typed backlog item (no free text outside the contract).
-- [ ] **Phase 4 — Response streaming**
+- [x] **Phase 4 — Response streaming**: `GET /api/chat/stream` streams chunks as Server-Sent Events.
 - [ ] **Phase 5 — Prompt engineering with XML tags**
 - [ ] **Phase 6 — Prompt evaluation**
 - [ ] **Phase 7 — Tool use**
@@ -102,7 +102,7 @@ curl http://localhost:8080/api/health
 Expected response:
 
 ```json
-{ "status": "UP", "service": "claude-spring-ai-engineering-lab", "phase": "phase-3" }
+{ "status": "UP", "service": "claude-spring-ai-engineering-lab", "phase": "phase-4" }
 ```
 
 ## Endpoints
@@ -132,6 +132,35 @@ curl -X POST http://localhost:8080/api/chat \
 ```json
 { "error": "message must not be blank" }
 ```
+
+### `GET /api/chat/stream` — streaming chat (Server-Sent Events)
+
+Streams Claude's answer incrementally as `text/event-stream`, separate from the synchronous
+`/api/chat` endpoint. Use `curl -N` to disable buffering and see chunks as they arrive:
+
+```bash
+curl -N "http://localhost:8080/api/chat/stream?message=Explique%20como%20desenhar%20um%20sistema%20de%20importacao%20CSV%20resiliente"
+```
+
+Output (one `data:` event per chunk):
+
+```
+data:Para
+
+data: desenhar
+
+data:  um sistema
+
+...
+```
+
+A blank `message` returns `400`:
+
+```json
+{ "error": "message must not be blank" }
+```
+
+If the stream fails mid-response, a friendly final chunk is emitted instead of a raw error.
 
 ### `POST /api/chat/conversations` — multi-turn chat
 

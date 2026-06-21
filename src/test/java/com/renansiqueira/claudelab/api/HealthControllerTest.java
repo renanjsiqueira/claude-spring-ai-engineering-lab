@@ -24,6 +24,6 @@ class HealthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("UP"))
                 .andExpect(jsonPath("$.service").value("claude-spring-ai-engineering-lab"))
-                .andExpect(jsonPath("$.phase").value("phase-3"));
+                .andExpect(jsonPath("$.phase").value("phase-4"));
     }
 }
