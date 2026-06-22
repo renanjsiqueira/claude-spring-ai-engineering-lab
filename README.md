@@ -7,7 +7,7 @@ The goal is to build, **phase by phase**, a clean and didactic reference project
 how to engineer real applications on top of Claude — from a single chat call all the way to agents
 and workflows.
 
-> Status: **Phase 8 — Persistence (PostgreSQL)** ✅
+> Status: **Phase 9 — RAG over project docs** ✅
 
 ## Why this project
 
@@ -64,7 +64,7 @@ The project is built incrementally. Each phase is small, tested, and ends with a
 - [x] **Phase 6 — Prompt evaluation**: dataset-driven code-based grading (`POST /api/evals/run`), reports in `evals/`.
 - [x] **Phase 7 — Tool use**: Claude calls Spring services as tools (`POST /api/agent/backlog`).
 - [x] **Phase 8 — Persistence**: Spring Data JPA + PostgreSQL + Flyway; projects & backlog items persisted (`docker-compose.yml`).
-- [ ] **Phase 9 — RAG**
+- [x] **Phase 9 — RAG**: retrieve from `docs/knowledge-base/` and answer with citations (`POST /api/rag/ask`).
 - [ ] **Phase 10 — MCP**
 - [ ] **Phase 11 — Agents and workflows**
 
@@ -138,7 +138,7 @@ curl http://localhost:8080/api/health
 Expected response:
 
 ```json
-{ "status": "UP", "service": "claude-spring-ai-engineering-lab", "phase": "phase-8" }
+{ "status": "UP", "service": "claude-spring-ai-engineering-lab", "phase": "phase-9" }
 ```
 
 ## Endpoints
@@ -338,6 +338,27 @@ curl http://localhost:8080/api/backlog/{id}
 
 - `POST /api/projects` → `201` with the project; duplicate id → `409`; blank `id`/`name` → `400`.
 - `GET /api/projects/{id}` and `GET /api/backlog/{id}` → `404` when not found.
+
+### `POST /api/rag/ask` — ask the project knowledge base (RAG)
+
+Retrieves relevant chunks from `docs/knowledge-base/` and answers **only** from them, citing the
+source files. See [`docs/rag.md`](docs/rag.md).
+
+```bash
+curl -X POST http://localhost:8080/api/rag/ask \
+  -H "Content-Type: application/json" \
+  -d '{"question": "Quais padrões devo seguir para criar uma nova feature?"}'
+```
+
+```json
+{
+  "answer": "...",
+  "sources": ["coding-standards.md", "architecture-guidelines.md"]
+}
+```
+
+If nothing relevant is found, the answer states there is not enough information and `sources` is
+empty. A blank `question` returns `400`.
 
 ## License
 

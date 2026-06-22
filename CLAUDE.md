@@ -47,7 +47,10 @@ Simple layered architecture under `com.renansiqueira.claudelab`; every layer pac
   Spring Data repositories; kept separate so `domain` stays framework-free.
 - `application` — non-Claude use-case services (`ProjectService`, `BacklogService`) + response DTOs +
   `NotFoundException`/`ConflictException` (mapped to 404/409 in `GlobalExceptionHandler`).
-- `rag`, `workflow`, `infra` — placeholders / config for later phases.
+- `rag` — retrieval-augmented generation over `docs/knowledge-base/`: chunking, an in-memory lexical
+  vector store (TF cosine, offline), startup ingestion, and `RagAnswerService` (grounds Claude, cites
+  source files). See `docs/rag.md`.
+- `workflow`, `infra` — placeholders / config for later phases.
 
 ### Persistence (Phase 8)
 
