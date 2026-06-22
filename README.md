@@ -7,7 +7,7 @@ The goal is to build, **phase by phase**, a clean and didactic reference project
 how to engineer real applications on top of Claude — from a single chat call all the way to agents
 and workflows.
 
-> Status: **Phase 6 — Prompt evaluation** ✅
+> Status: **Phase 7 — Tool use** ✅
 
 ## Why this project
 
@@ -61,7 +61,7 @@ The project is built incrementally. Each phase is small, tested, and ends with a
 - [x] **Phase 4 — Response streaming**: `GET /api/chat/stream` streams chunks as Server-Sent Events.
 - [x] **Phase 5 — Prompt engineering with XML tags**: versioned prompt templates (`ai.prompt`) with XML tags and few-shot examples.
 - [x] **Phase 6 — Prompt evaluation**: dataset-driven code-based grading (`POST /api/evals/run`), reports in `evals/`.
-- [ ] **Phase 7 — Tool use**
+- [x] **Phase 7 — Tool use**: Claude calls Spring services as tools (`POST /api/agent/backlog`).
 - [ ] **Phase 8 — RAG**
 - [ ] **Phase 9 — MCP**
 - [ ] **Phase 10 — Agents and workflows**
@@ -111,7 +111,7 @@ curl http://localhost:8080/api/health
 Expected response:
 
 ```json
-{ "status": "UP", "service": "claude-spring-ai-engineering-lab", "phase": "phase-6" }
+{ "status": "UP", "service": "claude-spring-ai-engineering-lab", "phase": "phase-7" }
 ```
 
 ## Endpoints
@@ -263,6 +263,32 @@ curl -X POST http://localhost:8080/api/evals/run
 
 Each case checks: valid JSON, correct type, has a title, minimum acceptance criteria, minimum
 technical tasks, and absence of forbidden terms.
+
+### `POST /api/agent/backlog` — tool-using backlog agent
+
+Claude turns a request into a persisted backlog item by **calling Spring services as tools**
+(`getProjectContext`, `estimateComplexity`, `createBacklogItem`). Spring AI runs the tool-calling
+loop automatically. See [`docs/tool-use.md`](docs/tool-use.md).
+
+```bash
+curl -X POST http://localhost:8080/api/agent/backlog \
+  -H "Content-Type: application/json" \
+  -d '{"projectId": "brabrix-dev", "message": "Crie uma tarefa para importar clientes via CSV"}'
+```
+
+```json
+{ "content": "Created the backlog item 'Import customers via CSV' for Brabrix (estimated complexity: HIGH)." }
+```
+
+The application logs show which tools were called, e.g.:
+
+```
+Tool getProjectContext called for projectId=brabrix-dev
+Tool estimateComplexity called -> HIGH
+Tool createBacklogItem called: id=... projectId=brabrix-dev title='Import customers via CSV'
+```
+
+Blank `projectId` or `message` returns `400`.
 
 ## License
 
