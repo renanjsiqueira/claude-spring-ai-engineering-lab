@@ -7,7 +7,7 @@ The goal is to build, **phase by phase**, a clean and didactic reference project
 how to engineer real applications on top of Claude — from a single chat call all the way to agents
 and workflows.
 
-> Status: **Phase 7 — Tool use** ✅
+> Status: **Phase 8 — Persistence (PostgreSQL)** ✅
 
 ## Why this project
 
@@ -20,7 +20,8 @@ portfolio piece.
 - Java 21
 - Spring Boot 3.5
 - Spring AI 1.1 (Anthropic / Claude)
-- Maven
+- Spring Data JPA + PostgreSQL + Flyway
+- Maven, Docker Compose
 
 Default model: `claude-opus-4-8` (configurable in `application.yml`).
 
@@ -62,9 +63,10 @@ The project is built incrementally. Each phase is small, tested, and ends with a
 - [x] **Phase 5 — Prompt engineering with XML tags**: versioned prompt templates (`ai.prompt`) with XML tags and few-shot examples.
 - [x] **Phase 6 — Prompt evaluation**: dataset-driven code-based grading (`POST /api/evals/run`), reports in `evals/`.
 - [x] **Phase 7 — Tool use**: Claude calls Spring services as tools (`POST /api/agent/backlog`).
-- [ ] **Phase 8 — RAG**
-- [ ] **Phase 9 — MCP**
-- [ ] **Phase 10 — Agents and workflows**
+- [x] **Phase 8 — Persistence**: Spring Data JPA + PostgreSQL + Flyway; projects & backlog items persisted (`docker-compose.yml`).
+- [ ] **Phase 9 — RAG**
+- [ ] **Phase 10 — MCP**
+- [ ] **Phase 11 — Agents and workflows**
 
 > Note: phases are grouped/ordered as they are actually built, so the numbering
 > can differ from the original course topic order. See
@@ -76,6 +78,31 @@ The project is built incrementally. Each phase is small, tested, and ends with a
 
 - Java 21
 - Maven 3.9+
+- Docker + Docker Compose (for the database)
+
+### Database
+
+Persistence uses PostgreSQL with Flyway migrations. Start the database with Docker Compose:
+
+```bash
+docker compose up -d postgres
+```
+
+This starts Postgres on `localhost:5432` (db/user/password all `claudelab`). On application startup,
+**Flyway runs the migrations** in `src/main/resources/db/migration/` (schema + a seeded `brabrix-dev`
+project), and Hibernate validates the entities against that schema.
+
+Connection settings come from env vars (with sensible local defaults):
+
+```bash
+export SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/claudelab"
+export SPRING_DATASOURCE_USERNAME="claudelab"
+export SPRING_DATASOURCE_PASSWORD="claudelab"
+```
+
+`mvn test` does **not** need Docker: tests run against in-memory H2 (PostgreSQL mode) under the
+`test` profile, with Flyway disabled. The `docker-compose.yml` also contains a commented optional
+`app` service.
 
 ### Configuration
 
@@ -111,7 +138,7 @@ curl http://localhost:8080/api/health
 Expected response:
 
 ```json
-{ "status": "UP", "service": "claude-spring-ai-engineering-lab", "phase": "phase-7" }
+{ "status": "UP", "service": "claude-spring-ai-engineering-lab", "phase": "phase-8" }
 ```
 
 ## Endpoints
@@ -288,7 +315,29 @@ Tool estimateComplexity called -> HIGH
 Tool createBacklogItem called: id=... projectId=brabrix-dev title='Import customers via CSV'
 ```
 
-Blank `projectId` or `message` returns `400`.
+Blank `projectId` or `message` returns `400`. The `createBacklogItem` tool now **persists to
+PostgreSQL** (against an existing project — `brabrix-dev` is seeded by a migration).
+
+### Projects & backlog persistence
+
+```bash
+# Create a project
+curl -X POST http://localhost:8080/api/projects \
+  -H "Content-Type: application/json" \
+  -d '{"id": "brabrix-dev", "name": "Brabrix", "description": "SaaS platform"}'
+
+# Get a project
+curl http://localhost:8080/api/projects/brabrix-dev
+
+# List a project's backlog
+curl http://localhost:8080/api/projects/brabrix-dev/backlog
+
+# Get a single backlog item by id (UUID)
+curl http://localhost:8080/api/backlog/{id}
+```
+
+- `POST /api/projects` → `201` with the project; duplicate id → `409`; blank `id`/`name` → `400`.
+- `GET /api/projects/{id}` and `GET /api/backlog/{id}` → `404` when not found.
 
 ## License
 

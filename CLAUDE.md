@@ -43,7 +43,19 @@ Simple layered architecture under `com.renansiqueira.claudelab`; every layer pac
   contract).
 - `tools` — Spring beans with `@Tool` methods that Claude can call.
 - `eval` — dataset-driven prompt evaluation (grading is pure; the runner calls Claude).
+- `persistence` — JPA entities (`Project`, `BacklogItem`, `AcceptanceCriterion`, `TechnicalTask`) +
+  Spring Data repositories; kept separate so `domain` stays framework-free.
+- `application` — non-Claude use-case services (`ProjectService`, `BacklogService`) + response DTOs +
+  `NotFoundException`/`ConflictException` (mapped to 404/409 in `GlobalExceptionHandler`).
 - `rag`, `workflow`, `infra` — placeholders / config for later phases.
+
+### Persistence (Phase 8)
+
+- PostgreSQL + Spring Data JPA + **Flyway** (`src/main/resources/db/migration/`). `Project.id` is a
+  human code (e.g. `brabrix-dev`) so it matches the agent's `projectId`; a migration seeds that
+  project. `BacklogTool.createBacklogItem` now persists via `BacklogService`.
+- Prod profile: Postgres datasource (env-var overridable), Flyway on, Hibernate `ddl-auto=validate`.
+- `docker compose up -d postgres` starts the DB; `mvn spring-boot:run` applies migrations on startup.
 
 ### Key cross-file flows
 
@@ -62,9 +74,12 @@ Simple layered architecture under `com.renansiqueira.claudelab`; every layer pac
 
 ## Conventions to follow when adding a phase
 
-- **Tests never hit the network.** Web layer: `@WebMvcTest(TheController.class)` + `@MockitoBean` for
-  the service. Pure logic (memory, grading, tools, templates): plain JUnit, instantiate directly.
-  `@SpringBootTest contextLoads` is the only full-context test and relies on the `not-set` key.
+- **Tests never hit the network and never need Docker.** Web layer: `@WebMvcTest(TheController.class)`
+  + `@MockitoBean` for the service. Pure logic (memory, grading, tools, templates): plain JUnit,
+  instantiate directly. Persistence: `@DataJpaTest` + `@ActiveProfiles("test")` +
+  `@AutoConfigureTestDatabase(replace = NONE)` against in-memory H2 (PostgreSQL mode); import the
+  service(s) under test. `@SpringBootTest contextLoads` uses `@ActiveProfiles("test")` (H2) and relies
+  on the `not-set` key.
 - **Validation**: request DTOs use Jakarta annotations (`@NotBlank`, `@DecimalMin/@DecimalMax`);
   `GlobalExceptionHandler` maps `MethodArgumentNotValidException` and `IllegalArgumentException` to
   `400 {"error": "..."}`. Reuse this contract.

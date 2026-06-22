@@ -1,10 +1,7 @@
 package com.renansiqueira.claudelab.tools;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import com.renansiqueira.claudelab.application.BacklogItemResponse;
+import com.renansiqueira.claudelab.application.BacklogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
@@ -12,17 +9,20 @@ import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
 
 /**
- * Tool that creates and persists backlog items.
- *
- * <p>Stored in memory for now; the contract is the same a database-backed
- * implementation would expose.
+ * Tool that creates and persists backlog items in PostgreSQL via
+ * {@link BacklogService}. Returns a lightweight {@link BacklogItem} record (not
+ * the JPA entity) so the tool result fed back to Claude stays small.
  */
 @Component
 public class BacklogTool {
 
     private static final Logger log = LoggerFactory.getLogger(BacklogTool.class);
 
-    private final Map<String, BacklogItem> store = new ConcurrentHashMap<>();
+    private final BacklogService backlogService;
+
+    public BacklogTool(BacklogService backlogService) {
+        this.backlogService = backlogService;
+    }
 
     @Tool(description = "Create and persist a backlog item for a project. "
             + "Returns the created item including its generated id.")
@@ -30,25 +30,9 @@ public class BacklogTool {
             @ToolParam(description = "Identifier of the project the item belongs to") String projectId,
             @ToolParam(description = "Short, descriptive title of the backlog item") String title,
             @ToolParam(description = "Detailed description of what needs to be done") String description) {
-        String id = UUID.randomUUID().toString();
-        BacklogItem item = new BacklogItem(id, projectId, title, description);
-        store.put(id, item);
-        log.info("Tool createBacklogItem called: id={} projectId={} title='{}'", id, projectId, title);
-        return item;
-    }
-
-    /** Test/inspection helper: look up a stored item by id. */
-    public Optional<BacklogItem> findById(String id) {
-        return Optional.ofNullable(store.get(id));
-    }
-
-    /** Test/inspection helper: number of stored items. */
-    public int count() {
-        return store.size();
-    }
-
-    /** Test/inspection helper: snapshot of stored items. */
-    public List<BacklogItem> findAll() {
-        return List.copyOf(store.values());
+        BacklogItemResponse saved = backlogService.createItem(projectId, title, description);
+        log.info("Tool createBacklogItem persisted id={} projectId={} title='{}'",
+                saved.id(), projectId, title);
+        return new BacklogItem(saved.id().toString(), saved.projectId(), saved.title(), description);
     }
 }

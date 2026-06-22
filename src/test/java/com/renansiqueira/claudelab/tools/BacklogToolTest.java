@@ -1,33 +1,34 @@
 package com.renansiqueira.claudelab.tools;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import com.renansiqueira.claudelab.application.BacklogItemResponse;
+import com.renansiqueira.claudelab.application.BacklogService;
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 class BacklogToolTest {
 
-    private final BacklogTool tool = new BacklogTool();
-
     @Test
-    void createsAndStoresItem() {
-        BacklogItem item = tool.createBacklogItem(
-                "brabrix-dev", "Import customers via CSV", "Allow bulk customer import from a CSV file.");
+    void persistsViaServiceAndMapsResult() {
+        BacklogService service = Mockito.mock(BacklogService.class);
+        UUID id = UUID.randomUUID();
+        when(service.createItem("brabrix-dev", "Import CSV", "Import customers via CSV"))
+                .thenReturn(new BacklogItemResponse(id, "brabrix-dev", null, "Import CSV",
+                        "Import customers via CSV", null, null, List.of(), List.of(), Instant.now()));
 
-        assertThat(item.id()).isNotBlank();
+        BacklogTool tool = new BacklogTool(service);
+        BacklogItem item = tool.createBacklogItem("brabrix-dev", "Import CSV", "Import customers via CSV");
+
+        assertThat(item.id()).isEqualTo(id.toString());
         assertThat(item.projectId()).isEqualTo("brabrix-dev");
-        assertThat(item.title()).isEqualTo("Import customers via CSV");
-
-        assertThat(tool.count()).isEqualTo(1);
-        assertThat(tool.findById(item.id())).contains(item);
-    }
-
-    @Test
-    void generatesDistinctIdsAndAccumulates() {
-        BacklogItem first = tool.createBacklogItem("p", "A", "desc a");
-        BacklogItem second = tool.createBacklogItem("p", "B", "desc b");
-
-        assertThat(first.id()).isNotEqualTo(second.id());
-        assertThat(tool.count()).isEqualTo(2);
-        assertThat(tool.findAll()).contains(first, second);
+        assertThat(item.title()).isEqualTo("Import CSV");
+        assertThat(item.description()).isEqualTo("Import customers via CSV");
+        verify(service).createItem("brabrix-dev", "Import CSV", "Import customers via CSV");
     }
 }

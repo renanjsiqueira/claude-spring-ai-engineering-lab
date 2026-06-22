@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: claudelab-postgres
+    environment:
+      POSTGRES_DB: claudelab
+      POSTGRES_USER: claudelab
+      POSTGRES_PASSWORD: claudelab
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U claudelab -d claudelab"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # Optional: run the app in a container too.
+  # Build an image first, e.g.:  mvn spring-boot:build-image -DskipTests
+  # then uncomment and set the image name below.
+  #
+  # app:
+  #   image: claude-spring-ai-engineering-lab:0.0.1-SNAPSHOT
+  #   container_name: claudelab-app
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   environment:
+  #     SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/claudelab
+  #     SPRING_DATASOURCE_USERNAME: claudelab
+  #     SPRING_DATASOURCE_PASSWORD: claudelab
+  #     ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+  #   ports:
+  #     - "8080:8080"
+
+volumes:
+  pgdata:

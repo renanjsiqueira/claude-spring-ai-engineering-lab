@@ -11,6 +11,17 @@ spring:
       chat:
         options:
           model: claude-opus-4-8
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/claudelab}
+    username: ${SPRING_DATASOURCE_USERNAME:claudelab}
+    password: ${SPRING_DATASOURCE_PASSWORD:claudelab}
+  jpa:
+    open-in-view: false
+    hibernate:
+      # Flyway owns the schema; Hibernate only validates the entities against it.
+      ddl-auto: validate
+  flyway:
+    enabled: true
 
 server:
   port: 8080

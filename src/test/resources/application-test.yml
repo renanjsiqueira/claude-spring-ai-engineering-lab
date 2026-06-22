@@ -1,0 +1,15 @@
+# Test profile: in-memory H2 in PostgreSQL-compatibility mode.
+# Keeps `mvn test` fast and offline — no Docker/Postgres needed.
+# Flyway is disabled here; Hibernate builds the schema from the entities.
+# Real Postgres migrations are exercised when the app runs (docker compose).
+spring:
+  datasource:
+    url: jdbc:h2:mem:claudelab;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
+    username: sa
+    password: ""
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  flyway:
+    enabled: false
