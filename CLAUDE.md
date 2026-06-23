@@ -50,7 +50,18 @@ Simple layered architecture under `com.renansiqueira.claudelab`; every layer pac
 - `rag` — retrieval-augmented generation over `docs/knowledge-base/`: chunking, an in-memory lexical
   vector store (TF cosine, offline), startup ingestion, and `RagAnswerService` (grounds Claude, cites
   source files). See `docs/rag.md`.
-- `workflow`, `infra` — placeholders / config for later phases.
+- `workflow` — agentic workflows (chaining, routing, parallel-review) behind `EngineeringWorkflow`,
+  talking to Claude via the `LlmStep` abstraction (mockable, so workflows are unit-tested without the
+  model). `POST /api/workflows/analyze`. See `docs/agents-and-workflows.md`.
+- `infra` — cross-cutting config (`ChatClientConfig`).
+
+### MCP server (Phase 10, experimental)
+
+`mcp-server/` is a **separate, standalone** Spring Boot app (its own `pom.xml`, NOT part of the root
+build — so it never affects `mvn test` or the core app). It uses Spring AI's MCP server starter
+(STDIO) with annotation-based registration (`@McpTool`/`@McpResource`/`@McpPrompt` from
+`org.springaicommunity.mcp.annotation`; schema types from `io.modelcontextprotocol.spec.McpSchema`).
+Build/run it on its own: `mvn -f mcp-server/pom.xml package`. See `docs/mcp.md`.
 
 ### Persistence (Phase 8)
 
