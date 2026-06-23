@@ -1,7 +1,9 @@
 /**
- * <strong>workflow</strong> — agents and multi-step workflows.
+ * <strong>workflow</strong> — agentic workflows built on the backlog assistant.
  *
- * <p>Code-orchestrated pipelines and agentic loops built on top of the
- * {@code ai} and {@code tools} layers. Added in the agents/workflows phase.
+ * <p>Three patterns: {@code ChainingWorkflow} (sequential steps), {@code RoutingWorkflow}
+ * (type-based dispatch) and {@code ParallelReviewWorkflow} (fan-out + merge). Each implements
+ * {@code EngineeringWorkflow} and talks to Claude through the {@code LlmStep} abstraction, which keeps
+ * the orchestration logic unit-testable without calling the model.
  */
 package com.renansiqueira.claudelab.workflow;
