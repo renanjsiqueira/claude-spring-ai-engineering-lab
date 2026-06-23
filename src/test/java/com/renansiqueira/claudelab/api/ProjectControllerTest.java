@@ -36,21 +36,21 @@ class ProjectControllerTest {
     @Test
     void createReturns201() throws Exception {
         when(projectService.create(any(), any(), any()))
-                .thenReturn(new ProjectResponse("brabrix-dev", "Brabrix", "desc", Instant.now()));
+                .thenReturn(new ProjectResponse("devbacklog-ai-assistant", "DevBacklog AI Assistant", "desc", Instant.now()));
 
         mockMvc.perform(post("/api/projects")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"id\": \"brabrix-dev\", \"name\": \"Brabrix\", \"description\": \"desc\"}"))
+                        .content("{\"id\": \"devbacklog-ai-assistant\", \"name\": \"DevBacklog AI Assistant\", \"description\": \"desc\"}"))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value("brabrix-dev"))
-                .andExpect(jsonPath("$.name").value("Brabrix"));
+                .andExpect(jsonPath("$.id").value("devbacklog-ai-assistant"))
+                .andExpect(jsonPath("$.name").value("DevBacklog AI Assistant"));
     }
 
     @Test
     void blankIdReturns400() throws Exception {
         mockMvc.perform(post("/api/projects")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"id\": \"\", \"name\": \"Brabrix\"}"))
+                        .content("{\"id\": \"\", \"name\": \"DevBacklog AI Assistant\"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("id must not be blank"));
     }
@@ -58,13 +58,13 @@ class ProjectControllerTest {
     @Test
     void duplicateReturns409() throws Exception {
         when(projectService.create(any(), any(), any()))
-                .thenThrow(new ConflictException("project 'brabrix-dev' already exists"));
+                .thenThrow(new ConflictException("project 'devbacklog-ai-assistant' already exists"));
 
         mockMvc.perform(post("/api/projects")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"id\": \"brabrix-dev\", \"name\": \"Brabrix\"}"))
+                        .content("{\"id\": \"devbacklog-ai-assistant\", \"name\": \"DevBacklog AI Assistant\"}"))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.error").value("project 'brabrix-dev' already exists"));
+                .andExpect(jsonPath("$.error").value("project 'devbacklog-ai-assistant' already exists"));
     }
 
     @Test
@@ -78,10 +78,10 @@ class ProjectControllerTest {
 
     @Test
     void listsBacklog() throws Exception {
-        when(projectService.backlog("brabrix-dev")).thenReturn(List.of(
+        when(projectService.backlog("devbacklog-ai-assistant")).thenReturn(List.of(
                 new BacklogItemSummaryResponse(UUID.randomUUID(), BacklogType.FEATURE, "Import CSV", Priority.HIGH)));
 
-        mockMvc.perform(get("/api/projects/brabrix-dev/backlog"))
+        mockMvc.perform(get("/api/projects/devbacklog-ai-assistant/backlog"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].title").value("Import CSV"))
                 .andExpect(jsonPath("$[0].type").value("FEATURE"));

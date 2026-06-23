@@ -33,7 +33,7 @@ public class ProjectMcpTools {
     @McpTool(name = "get_project_context",
             description = "Get a project's context (name, description and stack) by its id.")
     public String getProjectContext(
-            @McpToolParam(description = "The project id, e.g. 'brabrix-dev'", required = true)
+            @McpToolParam(description = "The project id, e.g. 'devbacklog-ai-assistant'", required = true)
             String projectId) {
         return knowledge.projectContext(projectId);
     }

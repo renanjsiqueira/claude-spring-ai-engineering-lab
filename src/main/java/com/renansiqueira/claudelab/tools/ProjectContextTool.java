@@ -20,16 +20,16 @@ public class ProjectContextTool {
     private static final Logger log = LoggerFactory.getLogger(ProjectContextTool.class);
 
     private final Map<String, ProjectContext> projects = Map.of(
-            "brabrix-dev", new ProjectContext(
-                    "brabrix-dev",
-                    "Brabrix",
-                    "SaaS platform for managing customers, transactions and billing.",
+            "devbacklog-ai-assistant", new ProjectContext(
+                    "devbacklog-ai-assistant",
+                    "DevBacklog AI Assistant",
+                    "Turns ideas, bugs and feature requests into structured engineering backlog items.",
                     List.of("Java 21", "Spring Boot", "Spring AI", "PostgreSQL")));
 
     @Tool(description = "Get the context of a project: its name, description and technology stack. "
             + "Call this before creating a backlog item so the item fits the project.")
     public ProjectContext getProjectContext(
-            @ToolParam(description = "The project identifier, e.g. 'brabrix-dev'") String projectId) {
+            @ToolParam(description = "The project identifier, e.g. 'devbacklog-ai-assistant'") String projectId) {
         log.info("Tool getProjectContext called for projectId={}", projectId);
         return projects.getOrDefault(projectId, new ProjectContext(
                 projectId, "Unknown project", "No context is registered for this project.", List.of()));

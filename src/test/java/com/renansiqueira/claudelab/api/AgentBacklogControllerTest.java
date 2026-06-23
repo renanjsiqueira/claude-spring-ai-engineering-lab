@@ -34,7 +34,7 @@ class AgentBacklogControllerTest {
 
         mockMvc.perform(post("/api/agent/backlog")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"projectId\": \"brabrix-dev\", \"message\": \"Crie uma tarefa para importar clientes via CSV\"}"))
+                        .content("{\"projectId\": \"devbacklog-ai-assistant\", \"message\": \"Crie uma tarefa para importar clientes via CSV\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").value("Created 'Import customers via CSV' (complexity: HIGH)."));
     }
@@ -52,7 +52,7 @@ class AgentBacklogControllerTest {
     void blankMessageReturns400() throws Exception {
         mockMvc.perform(post("/api/agent/backlog")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"projectId\": \"brabrix-dev\", \"message\": \"\"}"))
+                        .content("{\"projectId\": \"devbacklog-ai-assistant\", \"message\": \"\"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("message must not be blank"));
     }

@@ -18,8 +18,8 @@ import org.springframework.stereotype.Component;
 public class ProjectKnowledge {
 
     private static final Map<String, String> PROJECTS = Map.of(
-            "brabrix-dev",
-            "Brabrix — SaaS platform for managing customers, transactions and billing. "
+            "devbacklog-ai-assistant",
+            "DevBacklog AI Assistant — Turns ideas, bugs and feature requests into structured engineering backlog items. "
                     + "Stack: Java 21, Spring Boot, Spring AI, PostgreSQL.");
 
     private final Path knowledgeBaseDir;

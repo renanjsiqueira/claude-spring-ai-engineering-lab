@@ -66,7 +66,7 @@ Build/run it on its own: `mvn -f mcp-server/pom.xml package`. See `docs/mcp.md`.
 ### Persistence (Phase 8)
 
 - PostgreSQL + Spring Data JPA + **Flyway** (`src/main/resources/db/migration/`). `Project.id` is a
-  human code (e.g. `brabrix-dev`) so it matches the agent's `projectId`; a migration seeds that
+  human code (e.g. `devbacklog-ai-assistant`) so it matches the agent's `projectId`; a migration seeds that
   project. `BacklogTool.createBacklogItem` now persists via `BacklogService`.
 - Prod profile: Postgres datasource (env-var overridable), Flyway on, Hibernate `ddl-auto=validate`.
 - `docker compose up -d postgres` starts the DB; `mvn spring-boot:run` applies migrations on startup.

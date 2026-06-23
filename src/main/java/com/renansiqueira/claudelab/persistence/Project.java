@@ -8,7 +8,7 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 
 /**
- * A project. The id is a human-readable code (e.g. {@code brabrix-dev}) so it
+ * A project. The id is a human-readable code (e.g. {@code devbacklog-ai-assistant}) so it
  * lines up with the {@code projectId} used by the tool-using agent.
  */
 @Entity

@@ -33,13 +33,13 @@ class BacklogItemControllerTest {
     void returnsBacklogItem() throws Exception {
         UUID id = UUID.randomUUID();
         when(backlogService.get(id)).thenReturn(new BacklogItemResponse(
-                id, "brabrix-dev", BacklogType.FEATURE, "Import CSV", "summary", Priority.HIGH,
+                id, "devbacklog-ai-assistant", BacklogType.FEATURE, "Import CSV", "summary", Priority.HIGH,
                 "As a user...", List.of("AC1"), List.of("T1"), Instant.now()));
 
         mockMvc.perform(get("/api/backlog/" + id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id.toString()))
-                .andExpect(jsonPath("$.projectId").value("brabrix-dev"))
+                .andExpect(jsonPath("$.projectId").value("devbacklog-ai-assistant"))
                 .andExpect(jsonPath("$.acceptanceCriteria[0]").value("AC1"));
     }
 

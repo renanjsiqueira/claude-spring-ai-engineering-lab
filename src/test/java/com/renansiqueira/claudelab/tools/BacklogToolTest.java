@@ -18,17 +18,17 @@ class BacklogToolTest {
     void persistsViaServiceAndMapsResult() {
         BacklogService service = Mockito.mock(BacklogService.class);
         UUID id = UUID.randomUUID();
-        when(service.createItem("brabrix-dev", "Import CSV", "Import customers via CSV"))
-                .thenReturn(new BacklogItemResponse(id, "brabrix-dev", null, "Import CSV",
+        when(service.createItem("devbacklog-ai-assistant", "Import CSV", "Import customers via CSV"))
+                .thenReturn(new BacklogItemResponse(id, "devbacklog-ai-assistant", null, "Import CSV",
                         "Import customers via CSV", null, null, List.of(), List.of(), Instant.now()));
 
         BacklogTool tool = new BacklogTool(service);
-        BacklogItem item = tool.createBacklogItem("brabrix-dev", "Import CSV", "Import customers via CSV");
+        BacklogItem item = tool.createBacklogItem("devbacklog-ai-assistant", "Import CSV", "Import customers via CSV");
 
         assertThat(item.id()).isEqualTo(id.toString());
-        assertThat(item.projectId()).isEqualTo("brabrix-dev");
+        assertThat(item.projectId()).isEqualTo("devbacklog-ai-assistant");
         assertThat(item.title()).isEqualTo("Import CSV");
         assertThat(item.description()).isEqualTo("Import customers via CSV");
-        verify(service).createItem("brabrix-dev", "Import CSV", "Import customers via CSV");
+        verify(service).createItem("devbacklog-ai-assistant", "Import CSV", "Import customers via CSV");
     }
 }

@@ -24,7 +24,7 @@ schema is self-explanatory to the model:
 @Tool(description = "Get the context of a project: its name, description and technology stack. "
         + "Call this before creating a backlog item so the item fits the project.")
 public ProjectContext getProjectContext(
-        @ToolParam(description = "The project identifier, e.g. 'brabrix-dev'") String projectId) { ... }
+        @ToolParam(description = "The project identifier, e.g. 'devbacklog-ai-assistant'") String projectId) { ... }
 ```
 
 Every tool logs when it is invoked (`Tool getProjectContext called for projectId=...`), so you can see
@@ -53,19 +53,19 @@ complexity → create item → reply in plain language). Claude decides which to
 ```bash
 curl -X POST http://localhost:8080/api/agent/backlog \
   -H "Content-Type: application/json" \
-  -d '{"projectId": "brabrix-dev", "message": "Crie uma tarefa para importar clientes via CSV"}'
+  -d '{"projectId": "devbacklog-ai-assistant", "message": "Crie uma tarefa para importar clientes via CSV"}'
 ```
 
 ```json
-{ "content": "Created the backlog item 'Import customers via CSV' for Brabrix (estimated complexity: HIGH)." }
+{ "content": "Created the backlog item 'Import customers via CSV' for DevBacklog AI Assistant (estimated complexity: HIGH)." }
 ```
 
 While it runs, the logs show the tool calls, e.g.:
 
 ```
-Tool getProjectContext called for projectId=brabrix-dev
+Tool getProjectContext called for projectId=devbacklog-ai-assistant
 Tool estimateComplexity called -> HIGH
-Tool createBacklogItem called: id=... projectId=brabrix-dev title='Import customers via CSV'
+Tool createBacklogItem called: id=... projectId=devbacklog-ai-assistant title='Import customers via CSV'
 ```
 
 ## Design rules followed

@@ -17,7 +17,7 @@ it can never affect the main app or `mvn test`.
 - `estimate_task_complexity` — LOW/MEDIUM/HIGH estimate with a short justification.
 
 **Resources**
-- `project://brabrix-dev/context`
+- `project://devbacklog-ai-assistant/context`
 - `docs://architecture-guidelines`
 - `docs://coding-standards`
 

@@ -10,10 +10,10 @@ class ProjectContextToolTest {
 
     @Test
     void returnsContextForKnownProject() {
-        ProjectContext context = tool.getProjectContext("brabrix-dev");
+        ProjectContext context = tool.getProjectContext("devbacklog-ai-assistant");
 
-        assertThat(context.projectId()).isEqualTo("brabrix-dev");
-        assertThat(context.name()).isEqualTo("Brabrix");
+        assertThat(context.projectId()).isEqualTo("devbacklog-ai-assistant");
+        assertThat(context.name()).isEqualTo("DevBacklog AI Assistant");
         assertThat(context.stack()).contains("Java 21", "Spring AI");
     }
 

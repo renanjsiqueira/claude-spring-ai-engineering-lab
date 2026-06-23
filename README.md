@@ -108,7 +108,7 @@ docker compose up -d postgres
 ```
 
 PostgreSQL starts on `localhost:5432` (db/user/password all `claudelab`). On app startup, **Flyway**
-applies the migrations in `src/main/resources/db/migration/` (schema + a seeded `brabrix-dev`
+applies the migrations in `src/main/resources/db/migration/` (schema + a seeded `devbacklog-ai-assistant`
 project) and Hibernate validates the entities against that schema.
 
 ### 2. Provide your Anthropic key
@@ -206,7 +206,7 @@ curl -X POST http://localhost:8080/api/backlog/analyze -H "Content-Type: applica
 
 ```bash
 curl -X POST http://localhost:8080/api/agent/backlog -H "Content-Type: application/json" \
-  -d '{"projectId": "brabrix-dev", "message": "Crie uma tarefa para importar clientes via CSV"}'
+  -d '{"projectId": "devbacklog-ai-assistant", "message": "Crie uma tarefa para importar clientes via CSV"}'
 ```
 
 ### `POST /api/rag/ask` — RAG with citations
@@ -229,9 +229,9 @@ curl -X POST http://localhost:8080/api/workflows/analyze -H "Content-Type: appli
 
 ```bash
 curl -X POST http://localhost:8080/api/projects -H "Content-Type: application/json" \
-  -d '{"id": "brabrix-dev", "name": "Brabrix", "description": "SaaS platform"}'
-curl http://localhost:8080/api/projects/brabrix-dev
-curl http://localhost:8080/api/projects/brabrix-dev/backlog
+  -d '{"id": "devbacklog-ai-assistant", "name": "DevBacklog AI Assistant", "description": "AI backlog assistant"}'
+curl http://localhost:8080/api/projects/devbacklog-ai-assistant
+curl http://localhost:8080/api/projects/devbacklog-ai-assistant/backlog
 curl http://localhost:8080/api/backlog/{id}
 ```
 
@@ -271,17 +271,17 @@ The persistence path was verified end-to-end against real PostgreSQL (Flyway mig
 Hibernate `validate` passed):
 
 ```bash
-$ curl -s http://localhost:8080/api/projects/brabrix-dev
-{ "id":"brabrix-dev", "name":"Brabrix",
-  "description":"SaaS platform for managing customers, transactions and billing.",
+$ curl -s http://localhost:8080/api/projects/devbacklog-ai-assistant
+{ "id":"devbacklog-ai-assistant", "name":"DevBacklog AI Assistant",
+  "description":"Turns ideas, bugs and feature requests into structured engineering backlog items.",
   "createdAt":"2026-06-22T00:27:59.324203Z" }
 ```
 
 ```
 # application logs during POST /api/agent/backlog show the tool calls:
-Tool getProjectContext called for projectId=brabrix-dev
+Tool getProjectContext called for projectId=devbacklog-ai-assistant
 Tool estimateComplexity called -> HIGH
-Tool createBacklogItem persisted id=... projectId=brabrix-dev title='Import customers via CSV'
+Tool createBacklogItem persisted id=... projectId=devbacklog-ai-assistant title='Import customers via CSV'
 ```
 
 > Screenshots can be added here; the project is API-only, so the responses above are the primary

@@ -15,11 +15,11 @@ public class ProjectMcpResources {
         this.knowledge = knowledge;
     }
 
-    @McpResource(uri = "project://brabrix-dev/context",
-            name = "Brabrix project context",
-            description = "Name, description and technology stack of the brabrix-dev project.")
-    public String brabrixContext() {
-        return knowledge.projectContext("brabrix-dev");
+    @McpResource(uri = "project://devbacklog-ai-assistant/context",
+            name = "DevBacklog AI Assistant project context",
+            description = "Name, description and technology stack of the devbacklog-ai-assistant project.")
+    public String devbacklogContext() {
+        return knowledge.projectContext("devbacklog-ai-assistant");
     }
 
     @McpResource(uri = "docs://architecture-guidelines",

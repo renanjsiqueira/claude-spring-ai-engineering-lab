@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 /**
  * Request body for {@code POST /api/projects}.
  *
- * @param id          project code (e.g. "brabrix-dev"); must not be blank
+ * @param id          project code (e.g. "devbacklog-ai-assistant"); must not be blank
  * @param name        human-readable name; must not be blank
  * @param description optional description
  */
